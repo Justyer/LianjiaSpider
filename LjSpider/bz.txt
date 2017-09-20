@@ -1,0 +1,16 @@
+北京：https
+上海：http
+南京：https
+成都：https
+合肥：https
+济南：https
+青岛：https
+西安：lvju
+石家庄：lvju
+厦门：https
+郑州：None
+武汉:https
+
+西安，石家庄，郑州：没有数据
+合肥：无小区
+厦门：无成交
