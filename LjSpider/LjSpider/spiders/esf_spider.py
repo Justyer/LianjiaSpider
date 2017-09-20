@@ -20,7 +20,7 @@ class EsfHFSpider(CrawlSpider):
         # 'JOBDIR': 'crawls/lj_get_esf-3',
         # 'LOG_FILE': 'logs/lj_esf_house.log',
         'DOWNLOADER_MIDDLEWARES':{
-            'LjSpider.middlewares.ProxyMiddleware': 202,
+            # 'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
@@ -29,40 +29,49 @@ class EsfHFSpider(CrawlSpider):
     }
 
     def start_requests(self):
-        id_esf_url = Postgresql().query_by_sql('''
-                        select co.route,c.url
-                        from lj_community co,lj_district d,lj_city c
-                        where d.id=co.district_id and d.city_id=c.id and c.id=5
-                    ''')
-        for c_route in id_esf_url:
-            yield Request(
-                url + 'ershoufang/' + c_route[0] + '/',
-                meta={'community': c_route[0]},
-                callback=self.get_esf_url,
-                dont_filter=True
-            )
-
+        # id_esf_url = Postgresql().query_by_sql('''
+        #                 select co.route,c.url
+        #                 from lj_community co,lj_district d,lj_city c
+        #                 where d.id=co.district_id and d.city_id=c.id
+        #             ''')
+        # for c_route in id_esf_url:
+        #     yield Request(
+        #         url + 'ershoufang/' + c_route[0] + '/',
+        #         meta={'community': c_route[0]},
+        #         callback=self.get_esf_url,
+        #         dont_filter=True
+        #     )
+        return [Request(
+            'https://bj.lianjia.com/ershoufang/101101994584.html',
+            callback=self.get_esf_url,
+            dont_filter=True
+        )]
     def get_esf_url(self,response):
-        esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
-
-        for url in esf_url:
-            yield Request(
-                url,
-                meta=response.request.meta,
-                callback=self.get_esf_info,
-                dont_filter=True
-            )
-        page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
-        if page_box is not None:
-            totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
-            curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
-            if totalPage > curPage:
-                yield Request(
-                    response.url[0:response.url.find('/', 34) + 1] + 'pg' + str(curPage + 1) + '/',
-                    meta=response.request.meta,
-                    callback=self.get_esf_url,
-                    dont_filter=True
-                )
+        yield Request(
+            'https://bj.lianjia.com/ershoufang/101101994584.html',
+            callback=self.get_esf_info,
+            dont_filter=True
+        )
+        # esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
+        #
+        # for url in esf_url:
+        #     yield Request(
+        #         url,
+        #         meta=response.request.meta,
+        #         callback=self.get_esf_info,
+        #         dont_filter=True
+        #     )
+        # page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
+        # if page_box is not None:
+        #     totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
+        #     curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
+        #     if totalPage > curPage:
+        #         yield Request(
+        #             response.url[0:response.url.find('/', 34) + 1] + 'pg' + str(curPage + 1) + '/',
+        #             meta=response.request.meta,
+        #             callback=self.get_esf_url,
+        #             dont_filter=True
+        #         )
 
     def get_esf_info(self, response):
         print 'Url:', response.url
@@ -97,7 +106,7 @@ class EsfHFSpider(CrawlSpider):
         item['house_age']         = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋年限').extract_first()
         item['property_type']     = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'交易权属').extract_first()
         item['house_type']        = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋用途').extract_first()
-        item['house_owner']       = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
+        item['house_owner']       = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'产权所属').extract_first()
         item['listing_date']      = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
         item['total_price']       = sr.xpath('//span[@class="total"]/text()').extract_first()
         item['unit_price']        = sr.xpath('//span[@class="unitPriceValue"]/text()').extract_first()
