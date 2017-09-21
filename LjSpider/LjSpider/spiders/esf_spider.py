@@ -21,6 +21,7 @@ class EsfHFSpider(CrawlSpider):
         # 'LOG_FILE': 'logs/lj_esf_house.log',
         'DOWNLOADER_MIDDLEWARES':{
             # 'LjSpider.middlewares.ProxyMiddleware': 202,
+            'LjSpider.middlewares.ProxyxxxMiddleware': 203,
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
@@ -29,49 +30,40 @@ class EsfHFSpider(CrawlSpider):
     }
 
     def start_requests(self):
-        # id_esf_url = Postgresql().query_by_sql('''
-        #                 select co.route,c.url
-        #                 from lj_community co,lj_district d,lj_city c
-        #                 where d.id=co.district_id and d.city_id=c.id
-        #             ''')
-        # for c_route in id_esf_url:
-        #     yield Request(
-        #         url + 'ershoufang/' + c_route[0] + '/',
-        #         meta={'community': c_route[0]},
-        #         callback=self.get_esf_url,
-        #         dont_filter=True
-        #     )
-        return [Request(
-            'https://bj.lianjia.com/ershoufang/101101994584.html',
-            callback=self.get_esf_url,
-            dont_filter=True
-        )]
+        id_esf_url = Postgresql().query_by_sql('''
+                        select co.route,c.url
+                        from lj_community co,lj_district d,lj_city c
+                        where d.id=co.district_id and d.city_id=c.id and c.id=5
+                    ''')
+        for c_route, url in id_esf_url:
+            yield Request(
+                url + 'ershoufang/' + c_route + '/',
+                meta={'community': c_route},
+                callback=self.get_esf_url,
+                dont_filter=True
+            )
+
     def get_esf_url(self,response):
-        yield Request(
-            'https://bj.lianjia.com/ershoufang/101101994584.html',
-            callback=self.get_esf_info,
-            dont_filter=True
-        )
-        # esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
-        #
-        # for url in esf_url:
-        #     yield Request(
-        #         url,
-        #         meta=response.request.meta,
-        #         callback=self.get_esf_info,
-        #         dont_filter=True
-        #     )
-        # page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
-        # if page_box is not None:
-        #     totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
-        #     curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
-        #     if totalPage > curPage:
-        #         yield Request(
-        #             response.url[0:response.url.find('/', 34) + 1] + 'pg' + str(curPage + 1) + '/',
-        #             meta=response.request.meta,
-        #             callback=self.get_esf_url,
-        #             dont_filter=True
-        #         )
+        esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
+
+        for url in esf_url:
+            yield Request(
+                url,
+                meta=response.request.meta,
+                callback=self.get_esf_info,
+                dont_filter=True
+            )
+        page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
+        if page_box is not None:
+            totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
+            curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
+            if totalPage > curPage:
+                yield Request(
+                    response.url[0:response.url.find('/', 34) + 1] + 'pg' + str(curPage + 1) + '/',
+                    meta=response.request.meta,
+                    callback=self.get_esf_url,
+                    dont_filter=True
+                )
 
     def get_esf_info(self, response):
         print 'Url:', response.url
@@ -116,6 +108,11 @@ class EsfHFSpider(CrawlSpider):
 
         item['url']               = response.url
         item['crawl_time']        = time.strftime("%Y-%m-%d %X",time.localtime())
-        item['residence_url']     = response.url[0:22] + sr.xpath('//*[@class="communityName"]/a[1]/@href').extract_first()
+
+        residence_url = sr.xpath('//*[@class="communityName"]/a[1]/@href').extract_first()
+        if residence_url is not None:
+            item['residence_url'] = response.url[0:22] + residence_url
+        else:
+            item['residence_url'] = sr.xpath('//*[@class="communityName"]/a[1]/text()').extract_first()
         item['residence_id']      = 0
         yield item

@@ -138,6 +138,6 @@ class EsfIrtSpider(CrawlSpider):
         if residence_url is not None:
             item['residence_url'] = response.url[0:22] + residence_url
         else:
-            item['residence_url'] = None
+            item['residence_url'] = sr.xpath('//*[@class="communityName"]/a[1]/text()').extract_first()
         item['residence_id']      = 0
         yield item
