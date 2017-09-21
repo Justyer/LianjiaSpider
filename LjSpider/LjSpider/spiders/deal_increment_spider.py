@@ -4,6 +4,8 @@ import re
 import time
 import psycopg2
 
+from datetime import datetime
+
 from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.loader import ItemLoader
@@ -13,11 +15,11 @@ from LjSpider.items import *
 from LjSpider.Db.Postgresql import *
 from LjSpider.Exception import tryex
 
-class DealSpider(CrawlSpider):
-    name = 'lj_get_deal'
+class DealIrtSpider(CrawlSpider):
+    name = 'lj_get_deal_irt'
     start_urls = []
     custom_settings = {
-        'JOBDIR': 'crawls/lj_get_deal-njaby',
+        # 'JOBDIR': 'crawls/lj_get_deal-irt',
         # 'LOG_FILE': 'logs/lj_esf_transaction.log',
         'DOWNLOADER_MIDDLEWARES':{
             # 'LjSpider.middlewares.ProxyMiddleware': 202,
@@ -30,44 +32,67 @@ class DealSpider(CrawlSpider):
     }
 
     def start_requests(self):
-        id_route = Postgresql().query_by_sql('''
-                        select co.route,c.url
-                        from lj_district d,lj_community co,lj_city c
-                        where d.id=co.district_id and d.city_id=c.id and c.id<>2 and c.id<>3 and c.id<>8 and c.id<>9 and c.id<>10 and c.id<>11
-                    ''')
-        for route, url in id_route:
-            yield Request(
-                url + 'chengjiao/' + route + '/',
-                callback=self.get_deal_url,
-                dont_filter=True
-            )
+        # id_route = Postgresql().query_by_sql('''
+        #                 select co.route,c.url
+        #                 from lj_district d,lj_community co,lj_city c
+        #                 where d.id=co.district_id and d.city_id=c.id and c.id<>2 and c.id<>8 and c.id<>9 and c.id<>11
+        #             ''')
+        # for route, url in id_route:
+        #     yield Request(
+        #         url + 'chengjiao/' + route + '/',
+        #         callback=self.get_deal_url,
+        #         dont_filter=True
+        #     )
+        return [Request(
+            'https://bj.lianjia.com/chengjiao/baizhifang1/',
+            callback=self.get_deal_url,
+            dont_filter=True
+        )]
 
     def get_deal_url(self,response):
-        deal_url = Selector(response).xpath('/html/body/div[5]/div[1]/ul/li/a/@href').extract()
-        for url in deal_url:
-            yield Request(
-                url,
-                callback=self.get_deal_info,
-                dont_filter=True
-            )
+        deal_list = Selector(response).xpath('/html/body/div[5]/div[1]/ul/li').extract()
+        for li in deal_list:
+            url = Selector(text=li).xpath('//a/@href').extract_first()
+            deal_date = Selector(text=li).xpath('//*[@class="dealDate"]/text()').extract_first()
+            print 'nice:', url, deal_date
 
-        page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
-        if page_box is not None:
-            totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
-            curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
-            if totalPage > curPage:
-                next_page_url = response.url[0:33] + response.url.split('/')[4] + '/' + 'pg' + str(curPage + 1) + '/'
+            if deal_date == u'近30天内成交':
                 yield Request(
-                    next_page_url,
-                    callback=self.get_deal_url,
+                    url,
+                    callback=self.get_deal_info,
                     dont_filter=True
                 )
+
+        # page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
+        # if page_box is not None:
+        #     totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
+        #     curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
+        #     if totalPage > curPage:
+        #         next_page_url = response.url[0:33] + response.url.split('/')[4] + '/' + 'pg' + str(curPage + 1) + '/'
+        #         yield Request(
+        #             next_page_url,
+        #             callback=self.get_deal_url,
+        #             dont_filter=True
+        #         )
 
     def get_deal_info(self, response):
         print 'Url:', response.url
 
         sr = Selector(response)
         item = DealItem()
+
+        deal_date = tryex.strip(sr.xpath('//*[@class="house-title"]/div/span/text()').extract_first().split(' ')[0])
+        old_latest_date = datetime.strptime('2017.08.31', '%Y.%m.%d')
+        rtn = 0
+        try:
+            latest_date = datetime.strptime(deal_date, '%Y.%m.%d')
+        except:
+            rtn = 1
+        if rtn:
+            return
+        day_space = (latest_date - old_latest_date).days
+        if day_space < 0:
+            return
 
         item['structure']         = tryex.strip(sr.xpath('//*[@id="introduction"]/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first())
         item['orientation']       = tryex.strip(sr.xpath('//*[@id="introduction"]/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋朝向').extract_first())

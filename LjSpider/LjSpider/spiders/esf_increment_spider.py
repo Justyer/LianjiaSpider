@@ -4,6 +4,8 @@ import re
 import time
 import psycopg2
 
+from datetime import datetime
+
 from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.loader import ItemLoader
@@ -11,15 +13,17 @@ from scrapy.http import Request
 
 from LjSpider.items import *
 from LjSpider.Db.Postgresql import *
+from LjSpider.Exception import tryex
 
-class EsfHFSpider(CrawlSpider):
-    name = 'lj_get_esf_hf'
+class EsfIrtSpider(CrawlSpider):
+    name = 'lj_get_esf_irt'
     start_urls = []
     custom_settings = {
         # 'JOBDIR': 'crawls/lj_get_esf-3',
         # 'LOG_FILE': 'logs/lj_esf_house.log',
         'DOWNLOADER_MIDDLEWARES':{
-            'LjSpider.middlewares.ProxyMiddleware': 202,
+            # 'LjSpider.middlewares.ProxyMiddleware': 202,
+            'LjSpider.middlewares.ProxyxxxMiddleware': 302,
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
@@ -29,31 +33,33 @@ class EsfHFSpider(CrawlSpider):
 
     def start_requests(self):
         # id_esf_url = Postgresql().query('lj_residence', ['id', 'esf_url'])
-        # id_esf_url = Postgresql().query_by_sql('''
-        #                 select co.route,c.url
-        #                 from lj_community co,lj_district d,lj_city c
-        #                 where d.id=co.district_id and d.city_id=c.id and c.id=5
-        #             ''')
-        # for c_route in id_esf_url:
-        #     yield Request(
-        #         url + 'ershoufang/' + c_route[0] + '/co32/',
-        #         meta={'community': c_route[0]},
-        #         callback=self.get_esf_url,
-        #         dont_filter=True
-        #     )
-        yield [Request(
-            'https://nj.lianjia.com/ershoufang/caochangmendajie/co32/',
-            callback=self.get_esf_url,
-            dont_filter=True
-        )]
+        id_esf_url = Postgresql().query_by_sql('''
+                        select co.route,c.url
+                        from lj_community co,lj_district d,lj_city c
+                        where d.id=co.district_id and d.city_id=c.id
+                    ''')
+        for c_route, url in id_esf_url:
+            yield Request(
+                url + 'ershoufang/' + c_route + '/co32/',
+                meta={'community': c_route},
+                callback=self.get_esf_url,
+                dont_filter=True
+            )
+        # return [Request(
+        #     'https://nj.lianjia.com/ershoufang/hanzhongmendajie/co32/',
+        #     callback=self.get_esf_url,
+        #     dont_filter=True
+        # )]
 
     def get_esf_url(self,response):
         into_it = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li[1]/div[1]/div[4]/text()').extract_first()
-        fabu_time_gang = Selector(text=into_it).re(r'刚刚发布')
-        fabu_time_tian = Selector(text=into_it).re(r'(\d+)天以前发布')
+        if not into_it:
+            return
+        fabu_time_gang = Selector(text=into_it).re(r'%s' % u'刚刚发布')
+        fabu_time_tian = Selector(text=into_it).re(r'(\d+)%s' % u'天以前发布')
         if not fabu_time_gang and not fabu_time_tian:
             return
-        if fabu_time_tian > 5:
+        if fabu_time_tian != [] and int(fabu_time_tian[0]) > 1:
             return
 
         esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
@@ -82,11 +88,12 @@ class EsfHFSpider(CrawlSpider):
         sr = Selector(response)
         item = EsfItem()
 
-        listing_date = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li[1]/text()').extract_first()
-        old_latest_date = datetime.datetime.strptime('2017-08-08', '%Y-%M-%d')
-        latest_date = datetime.datetime.strptime(listing_date, '%Y-%M-%d')
-        if latest_date - old_latest_date < 0:
-            yield
+        listing_date = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
+        old_latest_date = datetime.strptime('2017-09-20', '%Y-%m-%d')
+        latest_date = datetime.strptime(listing_date, '%Y-%m-%d')
+        day_space = (latest_date - old_latest_date).days
+        if day_space < 0:
+            return
 
         item['structure']         = sr.xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
         item['orientation']       = sr.xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋朝向').extract_first()
@@ -116,8 +123,8 @@ class EsfHFSpider(CrawlSpider):
         item['house_age']         = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋年限').extract_first()
         item['property_type']     = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'交易权属').extract_first()
         item['house_type']        = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋用途').extract_first()
-        item['house_owner']       = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
-        item['listing_date']      = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
+        item['house_owner']       = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'产权所属').extract_first()
+        item['listing_date']      = listing_date
         item['total_price']       = sr.xpath('//span[@class="total"]/text()').extract_first()
         item['unit_price']        = sr.xpath('//span[@class="unitPriceValue"]/text()').extract_first()
         item['last_deal']         = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'上次交易').extract_first()
@@ -126,6 +133,11 @@ class EsfHFSpider(CrawlSpider):
 
         item['url']               = response.url
         item['crawl_time']        = time.strftime("%Y-%m-%d %X",time.localtime())
-        item['residence_url']     = response.url[0:22] + sr.xpath('//*[@class="communityName"]/a[1]/text()').extract_first()
+
+        residence_url = sr.xpath('//*[@class="communityName"]/a[1]/@href').extract_first()
+        if residence_url is not None:
+            item['residence_url'] = response.url[0:22] + residence_url
+        else:
+            item['residence_url'] = None
         item['residence_id']      = 0
         yield item

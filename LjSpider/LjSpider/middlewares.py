@@ -64,6 +64,16 @@ class ProxyABYMiddleware(object):
             request.meta["proxy"] = self.proxyServer
             request.headers["Proxy-Authorization"] = self.proxyAuth
 
+class ProxyxxxMiddleware(object):
+        def __init__(self):
+            self.proxyServer = "http://http-pro.abuyun.com:9010"
+            self.proxyUser = "H0Y4224KU6BFZOZP"
+            self.proxyPass = "7B3DA385EA211C9E"
+            self.proxyAuth = "Basic " + base64.b64encode(self.proxyUser + ":" + self.proxyPass)
+        def process_request(self, request, spider):
+            request.meta["proxy"] = self.proxyServer
+            request.headers["Proxy-Authorization"] = self.proxyAuth
+
 # class BlockCaptchaMiddleware(object):
 #     def process_request(self, request, spider):
 #         if Selector(text=request.url).re(r'captcha') == []:
