@@ -33,7 +33,7 @@ class DealSpider(CrawlSpider):
         id_route = Postgresql().query_by_sql('''
                         select co.route,c.url
                         from lj_district d,lj_community co,lj_city c
-                        where d.id=co.district_id and d.city_id=c.id and c.id<>2 and c.id<>3 and c.id<>8 and c.id<>9 and c.id<>10 and c.id<>11
+                        where d.id=co.district_id and d.city_id=c.id
                     ''')
         for route, url in id_route:
             yield Request(
@@ -98,7 +98,13 @@ class DealSpider(CrawlSpider):
         item['listing_date']      = tryex.strip(sr.xpath('//*[@id="introduction"]/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first())
         item['listing_price']     = tryex.strip(sr.xpath('//div[@class="msg"]/span[1]/label/text()').extract_first())
         item['total_price']       = tryex.strip(sr.xpath('//span[@class="dealTotalPrice"]/i/text()').extract_first())
-        item['transaction_date']  = tryex.strip(sr.xpath('//*[@class="house-title"]/div/span/text()').extract_first().split(' ')[0])
+
+        transaction_date = tryex.strip(sr.xpath('//*[@class="house-title"]/div/span/text()').extract_first())
+        if transaction_date:
+            item['transaction_date'] = transaction_date.split(' ')[0]
+        else:
+            item['transaction_date'] = None
+
         item['last_deal']         = tryex.strip(sr.xpath('//*[@id="chengjiao_record"]/ul/li[2]/p/text()').extract_first())
         item['deal_cycle']        = tryex.strip(sr.xpath('//*[@class="msg"]/span[2]/label/text()').extract_first())
         item['look_times']        = tryex.strip(sr.xpath('//*[@class="msg"]/span[4]/label/text()').extract_first())

@@ -13,7 +13,7 @@ from LjSpider.items import *
 from LjSpider.Db.Postgresql import *
 from LjSpider.Exception import tryex
 
-class EsfHFSpider(CrawlSpider):
+class EsfSpider(CrawlSpider):
     name = 'lj_get_esf'
     start_urls = []
     custom_settings = {

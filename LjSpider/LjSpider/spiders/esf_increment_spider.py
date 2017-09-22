@@ -3,8 +3,7 @@
 import re
 import time
 import psycopg2
-
-from datetime import datetime
+import datetime
 
 from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
@@ -23,7 +22,7 @@ class EsfIrtSpider(CrawlSpider):
         # 'LOG_FILE': 'logs/lj_esf_house.log',
         'DOWNLOADER_MIDDLEWARES':{
             # 'LjSpider.middlewares.ProxyMiddleware': 202,
-            'LjSpider.middlewares.ProxyxxxMiddleware': 302,
+            # 'LjSpider.middlewares.ProxyxxxMiddleware': 302,
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
@@ -89,8 +88,14 @@ class EsfIrtSpider(CrawlSpider):
         item = EsfItem()
 
         listing_date = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
-        old_latest_date = datetime.strptime('2017-09-20', '%Y-%m-%d')
-        latest_date = datetime.strptime(listing_date, '%Y-%m-%d')
+        today = datetime.date.today()
+        oneday = datetime.timedelta(days=1)
+        yesterday = today - oneday
+        old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
+        try:
+            latest_date = datetime.datetime.strptime(listing_date, '%Y-%m-%d')
+        except:
+            return
         day_space = (latest_date - old_latest_date).days
         if day_space < 0:
             return
