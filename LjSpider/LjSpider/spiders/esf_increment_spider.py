@@ -18,10 +18,10 @@ class EsfIrtSpider(CrawlSpider):
     name = 'lj_get_esf_irt'
     start_urls = []
     custom_settings = {
-        # 'JOBDIR': 'crawls/lj_get_esf-3',
+        'JOBDIR': 'crawls/lj_get_esf_irt_2017-09-24',
         # 'LOG_FILE': 'logs/lj_esf_house.log',
         'DOWNLOADER_MIDDLEWARES':{
-            # 'LjSpider.middlewares.ProxyMiddleware': 202,
+            'LjSpider.middlewares.ProxyMiddleware': 202,
             # 'LjSpider.middlewares.ProxyxxxMiddleware': 302,
         },
         'ITEM_PIPELINES':{
@@ -89,7 +89,7 @@ class EsfIrtSpider(CrawlSpider):
 
         listing_date = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=1)
+        oneday = datetime.timedelta(days=2)
         yesterday = today - oneday
         old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
         try:
