@@ -25,8 +25,8 @@ RETRY_ENABLED = True
 RETRY_TIMES = 25
 RETRY_HTTP_CODES = [500,502,503,504,408,302]
 
-FEED_URI = '/home/nightheart/workspace/www/LianjiaSpider/LjSpider/esf_irt_2017-09-24.csv'
-# FEED_URI = '/mnt/d/workspace/www/LianjiaSpider/LjSpider/esf_irt_20170922.csv'
+# FEED_URI = '/home/nightheart/workspace/www/LianjiaSpider/LjSpider/esf_irt_2017-09-24.csv'
+# FEED_URI = '/mnt/d/workspace/www/LianjiaSpider/LjSpider/deal_irt_2017-09.csv'
 FEED_FORMAT = 'CSV'
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)

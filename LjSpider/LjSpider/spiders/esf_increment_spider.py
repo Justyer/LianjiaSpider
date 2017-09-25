@@ -18,8 +18,9 @@ class EsfIrtSpider(CrawlSpider):
     name = 'lj_get_esf_irt'
     start_urls = []
     custom_settings = {
-        'JOBDIR': 'crawls/lj_get_esf_irt_2017-09-24',
-        # 'LOG_FILE': 'logs/lj_esf_house.log',
+        'FEED_URI': '../../common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
+        'JOBDIR': '../../common/lj/crawls/lj_get_esf_irt_%s' % datetime.date.today(),
+        'LOG_FILE': '../../common/lj/logs/lj_es_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
             # 'LjSpider.middlewares.ProxyxxxMiddleware': 302,

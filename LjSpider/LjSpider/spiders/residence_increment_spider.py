@@ -17,6 +17,8 @@ from scrapy.http import Request
 from LjSpider.items import *
 from LjSpider.Db.Postgresql import *
 
+from LjSpider.Exception.tryex import *
+
 class ResidenceIrtSpider(CrawlSpider):
     name = 'lj_get_residence_irt'
     start_urls = []
@@ -34,19 +36,35 @@ class ResidenceIrtSpider(CrawlSpider):
 
     def __init__(self):
         self.d_c = {}
+        d_c_q = Postgresql().query_by_sql('''
+            select d.route,c.route,c.id
+            from t_web_lj_district d,t_web_lj_community c
+            where d.id=c.district_id
+        ''')
+        for dc in d_c_q:
+            d_c[dc[0] + '_' + dc[1]] = dc[2]
+
 
     def start_requests(self):
-        csv_reader = csv.DictReader(codecs.open('../esf_irt_2017-09-22.csv', 'r', encoding='utf-8'))
+        url_list = []
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        csv_reader = csv.DictReader(codecs.open('../esf_irt_%s.csv' % str(yesterday), 'r', encoding='utf-8'))
         for row in csv_reader:
-            rlt = Postgresql().query_by_sql("select count(*) from lj_residence where url='%s'" % row['residence_url'])
+            url_list.apppend(row['residence_url'])
+            url_set = set(url_list)
+        for url in url_set:
+            rlt = Postgresql().query_by_sql("select count(*) from lj_residence where url='%s'" % url)
             if rlt == []:
                 yield Request(
-                    row['residence_url'],
+                    url,
                     callback=self.get_residence_info
                 )
 
     def get_residence_info(self, response):
         sr = Selector(response)
+        r_district = tryex.split(sr.xpath('//*[@class="fl l-txt"]/a[3]/@href').extract_first(), '/', -2)
+        r_community = tryex.split(sr.xpath('//*[@class="fl l-txt"]/a[4]/@href').extract_first(), '/', -2)
+
         item = ResidenceItem()
         item['residence_name']   = sr.xpath('//*[@class="detailTitle"]/text()').extract_first()
         item['avg_price']        = sr.xpath('//*[@class="xiaoquUnitPrice"]/text()').extract_first()
@@ -61,5 +79,5 @@ class ResidenceIrtSpider(CrawlSpider):
         item['total_houses']     = sr.xpath('//*[@class="xiaoquInfo"]/div[7]/span[2]/text()').extract_first()
         item['url']              = response.url
         item['crawl_time']       = time.strftime("%Y-%m-%d %X",time.localtime())
-        item['community_id']     = self.d_c[response.request.meta['d_c']]
+        item['community_id']     = self.d_c[r_district + '_' + r_community]
         yield item

@@ -18,10 +18,11 @@ class DealIrtSpider(CrawlSpider):
     name = 'lj_get_deal_irt'
     start_urls = []
     custom_settings = {
-        # 'JOBDIR': 'crawls/lj_get_deal-irt',
-        # 'LOG_FILE': 'logs/lj_esf_transaction.log',
+        'FEED_URI': '../../common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
+        'JOBDIR': '../../common/lj/crawls/lj_get_deal_irt_%s' % datetime.date.today(),
+        'LOG_FILE': '../../common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
-            # 'LjSpider.middlewares.ProxyMiddleware': 202,
+            'LjSpider.middlewares.ProxyMiddleware': 202,
             # 'LjSpider.middlewares.ProxyABYMiddleware': 203,
         },
         'ITEM_PIPELINES':{
@@ -43,12 +44,17 @@ class DealIrtSpider(CrawlSpider):
                 dont_filter=True
             )
 
+        # return [Request(
+        #     'https://bj.lianjia.com/chengjiao/anzhen1/',
+        #     callback=self.get_deal_url,
+        #     dont_filter=True
+        # )]
+
     def get_deal_url(self,response):
         deal_list = Selector(response).xpath('/html/body/div[5]/div[1]/ul/li').extract()
         for li in deal_list:
             url = Selector(text=li).xpath('//a/@href').extract_first()
             deal_date = Selector(text=li).xpath('//*[@class="dealDate"]/text()').extract_first()
-            print 'nice:', url, deal_date
 
             if deal_date == u'近30天内成交':
                 yield Request(
@@ -56,6 +62,8 @@ class DealIrtSpider(CrawlSpider):
                     callback=self.get_deal_info,
                     dont_filter=True
                 )
+            else:
+                return
 
         page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
         if page_box is not None:
@@ -82,7 +90,7 @@ class DealIrtSpider(CrawlSpider):
             return
 
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=1)
+        oneday = datetime.timedelta(days=25)
         yesterday = today - oneday
         old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
         try:

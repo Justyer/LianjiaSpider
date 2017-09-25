@@ -13,6 +13,7 @@ from LjSpider.Exception import tryex
 class TestSpider(CrawlSpider):
     name = 'sys_test'
     start_urls = [
+        'https://bj.lianjia.com/xiaoqu/1111047349969/',
         'https://nj.lianjia.com/ershoufang/103101703194.html',
         'https://nj.lianjia.com/chengjiao/103101536973.html',
         'http://sh.lianjia.com/xiaoqu/dahua/',
@@ -32,6 +33,16 @@ class TestSpider(CrawlSpider):
         }
     }
 
+    def __init__(self):
+        self.d_c = {}
+        d_c_q = Postgresql().query_by_sql('''
+            select d.route,c.route,c.id
+            from lj_district d,lj_community c
+            where d.id=c.district_id
+        ''')
+        for dc in d_c_q:
+            self.d_c[dc[0] + '_' + dc[1]] = dc[2]
+
     def start_requests(self):
         return [Request(
             self.start_urls[0],
@@ -40,7 +51,22 @@ class TestSpider(CrawlSpider):
         )]
 
     def test_page(self, response):
-        print Selector(response).xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
+        def rtn(sr):
+            try:
+                print 'sr front'
+                sr
+                print 'sr back'
+            except:
+                return
+        no = None
+        rtn(no.split('/')[-2])
+        # print self.d_c
+        # sr = Selector(response)
+        # r_district = sr.xpath('//*[@class="fl l-txt"]/a[3]/@href').extract_first().split('/')[-2]
+        # r_community = sr.xpath('//*[@class="fl l-txt"]/a[4]/@href').extract_first().split('/')[-2]
+        # print r_district + '_' + r_community
+        # print self.d_c[r_district + '_' + r_community]
+        # print Selector(response).xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
         # print 'df:::::', Selector(response).xpath('//*[@id="chengjiao_record"]/ul/li[1]/p/text()').extract_first()
         # print 'fasfsd', Selector(response).xpath('//*[@class="msg"]/span[2]/label/text()').extract_first()
         # stre = '   fafs   '
