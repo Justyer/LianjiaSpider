@@ -36,12 +36,12 @@ class TestSpider(CrawlSpider):
     def __init__(self):
         self.d_c = {}
         d_c_q = Mysql().query_by_sql('''
-            select d.route,c.route,c.id
+            select d.route d_r,c.route c_r,c.id
             from t_web_lj_district d,t_web_lj_community c
             where d.id=c.district_id
         ''')
         for dc in d_c_q:
-            self.d_c[dc[0] + '_' + dc[1]] = dc[2]
+            self.d_c[dc['d_r'] + '_' + dc['c_r']] = dc['id']
 
     def start_requests(self):
         return [Request(
