@@ -10,22 +10,21 @@ from scrapy.loader import ItemLoader
 from scrapy.http import Request
 
 from LjSpider.items import *
-from LjSpider.Db.Postgresql import *
+from LjSpider.Db.Mysql import *
 
 class ResidenceSpider(CrawlSpider):
     name = 'lj_get_residence'
-    start_urls = [
-        'https://bj.lianjia.com/xiaoqu/'
-    ]
+    start_urls = []
     custom_settings = {
-        # 'JOBDIR': 'crawls/lj_get_deal-1000-5000',
-        # 'LOG_FILE': 'logs/lj_esf_transaction.log',
+        'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_residence_irt_%s.csv' % datetime.date.today(),
+        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_residence_irt_%s' % datetime.date.today(),
+        'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_residence_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
-        #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
-           'LjSpider.pipelines.JsonPipeline': 301,
+        #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
+        #    'LjSpider.pipelines.JsonPipeline': 301,
         }
     }
 
@@ -33,19 +32,17 @@ class ResidenceSpider(CrawlSpider):
         self.d_c = {}
 
     def start_requests(self):
-        q_result = Postgresql().query_by_sql('''
-                            select co.id,di.route,co.route
-                            from lj_community co,lj_district di
-                            where co.district_id=di.id and di.city_id=1;
+        q_result = Mysql().query_by_sql('''
+                            select co.id,di.route d_r,co.route c_r,ci.url
+                            from t_web_lj_community co,t_web_lj_district di,t_web_lj_city ci
+                            where co.district_id=di.id and di.city_id=ci.id;
                         ''')
-        route_list = []
-        for id_, d_route, c_route in q_result:
-            self.d_c[d_route + '_' + c_route] = id_
-            route_list.append(c_route)
+        for one_r in q_result:
+            self.d_c[one_r['d_r'] + '_' + one_r['c_r']] = one_r['id']
 
-        for route in route_list:
+        for one_d in q_result:
             yield Request(
-                self.start_urls[0] + route + '/',
+                one_d['url'] + 'xiaoqu/' + one_d['c_r'] + '/',
                 callback=self.get_residence_url
             )
 
