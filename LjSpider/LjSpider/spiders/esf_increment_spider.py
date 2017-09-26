@@ -33,22 +33,22 @@ class EsfIrtSpider(CrawlSpider):
 
     def start_requests(self):
         # id_esf_url = Postgresql().query('lj_residence', ['id', 'esf_url'])
-        id_esf_url = Mysql().query_by_sql('''
-                        select co.route,c.url
-                        from t_web_lj_community co,t_web_lj_district d,t_web_lj_city c
-                        where d.id=co.district_id and d.city_id=c.id
-                    ''')
-        for route_url in id_esf_url:
-            yield Request(
-                route_url['url'] + 'ershoufang/' + route_url['route'] + '/co32/',
-                callback=self.get_esf_url,
-                dont_filter=True
-            )
-        # return [Request(
-        #     'https://nj.lianjia.com/ershoufang/hanzhongmendajie/co32/',
-        #     callback=self.get_esf_url,
-        #     dont_filter=True
-        # )]
+        # id_esf_url = Mysql().query_by_sql('''
+        #                 select co.route,c.url
+        #                 from t_web_lj_community co,t_web_lj_district d,t_web_lj_city c
+        #                 where d.id=co.district_id and d.city_id=c.id
+        #             ''')
+        # for route_url in id_esf_url:
+        #     yield Request(
+        #         route_url['url'] + 'ershoufang/' + route_url['route'] + '/co32/',
+        #         callback=self.get_esf_url,
+        #         dont_filter=True
+        #     )
+        return [Request(
+            'https://nj.lianjia.com/ershoufang/hanzhongmendajie/co32/',
+            callback=self.get_esf_url,
+            dont_filter=True
+        )]
 
     def get_esf_url(self,response):
         into_it = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li[1]/div[1]/div[4]/text()').extract_first()
@@ -69,17 +69,17 @@ class EsfIrtSpider(CrawlSpider):
                 callback=self.get_esf_info,
                 dont_filter=True
             )
-        page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
-        if page_box is not None:
-            totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
-            curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
-            if totalPage > curPage:
-                yield Request(
-                    response.url[0:response.url.find('/', 34) + 1] + 'pg' + str(curPage + 1) + 'co32/',
-                    meta=response.request.meta,
-                    callback=self.get_esf_url,
-                    dont_filter=True
-                )
+        # page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
+        # if page_box is not None:
+        #     totalPage = eval(Selector(response).xpath('//@page-data').extract_first())['totalPage']
+        #     curPage = eval(Selector(response).xpath('//@page-data').extract_first())['curPage']
+        #     if totalPage > curPage:
+        #         yield Request(
+        #             response.url[0:response.url.find('/', 34) + 1] + 'pg' + str(curPage + 1) + 'co32/',
+        #             meta=response.request.meta,
+        #             callback=self.get_esf_url,
+        #             dont_filter=True
+        #         )
 
     def get_esf_info(self, response):
         # print 'Url:', response.url
