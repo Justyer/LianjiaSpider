@@ -35,7 +35,7 @@ class TestSpider(CrawlSpider):
 
     def __init__(self):
         self.d_c = {}
-        d_c_q = Postgresql().query_by_sql('''
+        d_c_q = Mysql().query_by_sql('''
             select d.route,c.route,c.id
             from lj_district d,lj_community c
             where d.id=c.district_id
