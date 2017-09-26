@@ -1,5 +1,7 @@
 #-*- encoding:utf-8 -*-
 
+import codecs
+
 from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
 from scrapy.loader import ItemLoader
@@ -33,16 +35,6 @@ class TestSpider(CrawlSpider):
         }
     }
 
-    def __init__(self):
-        self.d_c = {}
-        d_c_q = Mysql().query_by_sql('''
-            select d.route d_r,c.route c_r,c.id
-            from t_web_lj_district d,t_web_lj_community c
-            where d.id=c.district_id
-        ''')
-        for dc in d_c_q:
-            self.d_c[dc['d_r'] + '_' + dc['c_r']] = dc['id']
-
     def start_requests(self):
         return [Request(
             self.start_urls[0],
@@ -51,63 +43,6 @@ class TestSpider(CrawlSpider):
         )]
 
     def test_page(self, response):
-        def rtn(sr):
-            try:
-                print 'sr front'
-                sr
-                print 'sr back'
-            except:
-                return
-        no = None
-        rtn(no.split('/')[-2])
-        # print self.d_c
-        # sr = Selector(response)
-        # r_district = sr.xpath('//*[@class="fl l-txt"]/a[3]/@href').extract_first().split('/')[-2]
-        # r_community = sr.xpath('//*[@class="fl l-txt"]/a[4]/@href').extract_first().split('/')[-2]
-        # print r_district + '_' + r_community
-        # print self.d_c[r_district + '_' + r_community]
-        # print Selector(response).xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
-        # print 'df:::::', Selector(response).xpath('//*[@id="chengjiao_record"]/ul/li[1]/p/text()').extract_first()
-        # print 'fasfsd', Selector(response).xpath('//*[@class="msg"]/span[2]/label/text()').extract_first()
-        # stre = '   fafs   '
-        # print 'front:' + tryex.tryex(stre) + ':back'
-        # print Selector(response).xpath('//*[@class="house-title"]/div/span/text()').extract_first().split(' ')
-        # sr = Selector(response)
-        # print sr.re(r"resblockId:'(.*)'")
-        # count = Selector(response).xpath('//*[@class="list-head clear"]/h2/span/text()').extract_first()
-        # page = Selector(response).xpath('//*[@gahref="results_totalpage"]/text()').extract_first()
-        # print 'count,page:', count, page
-        # print response.url + '-------============'
-        # page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
-        # if page_box is not None:
-        #     totalPage = eval(Selector(text=page_box).xpath('//@page-data').extract_first())['totalPage']
-        #     curPage = eval(Selector(text=page_box).xpath('//@page-data').extract_first())['curPage']
-        #     if totalPage > curPage:
-        #         yield Request(
-        #             response.url[0:response.url.find('/', 30) + 1] + 'pg' + str(curPage + 1) + '/',
-        #             callback=self.test_page
-        #         )
-        # sr = Selector(response)
-        # print 'result:', sr.xpath('/html/body/div[4]/div/text()').extract_first().split(' ')[0]
-        # print 'result:', sr.re(r"resblockName:'[^x00-xff]{1,}'")
-        # print Postgresql().query('nice', ['id', 't1', 't2'])
-        # print 'headers:', response.headers
-        # print 'headers2:', response.request.headers
-        # print response.text
-        # print Selector(response).xpath('//span[@class="total"]/text()').extract_first()
-        # print 'nice:', Selector(text='https://captcha.lianjia.com/').re(r'captcha') == []
-
-        # item = TestItem()
-        # item['t1'] = 13
-        # item['t2'] = 'rt'
-        # print 'type:', type(item)
-        # print 'item:', item
-        # print isinstance(item, type(item))
-        # print 'classname:', item.__class__.__name__
-        # print 'name:', item.__table__
-        # print 'type_name:', type(item.__table__)
-        # print item.__table__ + 'jujuye'
-        #
-        # Postgresql().insert(item)
-
-        # print 'geta:', Selector(response).xpath('//span[@class="dealTotalPrice"]/i/text()').extract_first()
+        fil = codecs.open('/usr/local/crawler/dxc/I.txt', 'a', encoding='utf-8')
+        fil.write('I am I.')
+        fil.close()

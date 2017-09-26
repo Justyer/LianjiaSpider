@@ -78,7 +78,7 @@ class DealIrtSpider(CrawlSpider):
                 )
 
     def get_deal_info(self, response):
-        print 'Url:', response.url
+        # print 'Url:', response.url
 
         sr = Selector(response)
         item = DealItem()

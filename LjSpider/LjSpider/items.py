@@ -14,28 +14,28 @@ class TestItem(scrapy.Item):
     t2 = scrapy.Field()
 
 class CityItem(scrapy.Item):
-    __table__ = 'lj_city'
+    __table__ = 't_web_lj_city'
 
     cn_name = scrapy.Field()
     route   = scrapy.Field()
     url     = scrapy.Field()
 
 class DistrictItem(scrapy.Item):
-    __table__ = 'lj_district'
+    __table__ = 't_web_lj_district'
 
     cn_name = scrapy.Field()
     route   = scrapy.Field()
     city_id = scrapy.Field()
 
 class CommunityItem(scrapy.Item):
-    __table__ = 'lj_community'
+    __table__ = 't_web_lj_community'
 
     cn_name     = scrapy.Field()
     route       = scrapy.Field()
     district_id = scrapy.Field()
 
 class ResidenceItem(scrapy.Item):
-    __table__ = 'lj_residence_bj_new'
+    __table__ = 't_web_lj_residence'
 
     residence_name   = scrapy.Field()
     avg_price        = scrapy.Field()
@@ -52,18 +52,18 @@ class ResidenceItem(scrapy.Item):
     crawl_time       = scrapy.Field()
     community_id     = scrapy.Field()
 
-class AroundItem(scrapy.Item):
-    __table__ = 'lj_residence_around'
-
-    title        = scrapy.Field()
-    description  = scrapy.Field()
-    distance     = scrapy.Field()
-    type2        = scrapy.Field()
-    type1        = scrapy.Field()
-    residence_id = scrapy.Field()
+# class AroundItem(scrapy.Item):
+#     __table__ = 't_web_lj_residence_around'
+#
+#     title        = scrapy.Field()
+#     description  = scrapy.Field()
+#     distance     = scrapy.Field()
+#     type2        = scrapy.Field()
+#     type1        = scrapy.Field()
+#     residence_id = scrapy.Field()
 
 class EsfItem(scrapy.Item):
-    __table__ = 'lj_esf'
+    __table__ = 't_web_lj_esf'
 
     structure         = scrapy.Field()
     orientation       = scrapy.Field()
@@ -80,7 +80,7 @@ class EsfItem(scrapy.Item):
     elevator          = scrapy.Field()
 
     ring_num          = scrapy.Field()
-    lj_num            = scrapy.Field()
+    t_web_lj_num            = scrapy.Field()
 
     house_age         = scrapy.Field()
     property_type = scrapy.Field()
@@ -98,26 +98,26 @@ class EsfItem(scrapy.Item):
     residence_url     = scrapy.Field()
     residence_id      = scrapy.Field()
 
-class DealCountItem(scrapy.Item):
-    __table__ = 'lj_deal_count'
-
-    name         = scrapy.Field()
-    count        = scrapy.Field()
-    page         = scrapy.Field()
-    residence_id = scrapy.Field()
-
-class DealNewCountItem(scrapy.Item):
-    __table__ = 'lj_deal_count2_1'
-
-    name         = scrapy.Field()
-    route        = scrapy.Field()
-    count        = scrapy.Field()
-    page         = scrapy.Field()
-    url          = scrapy.Field()
-    community_id = scrapy.Field()
+# class DealCountItem(scrapy.Item):
+#     __table__ = 't_web_lj_deal_count'
+#
+#     name         = scrapy.Field()
+#     count        = scrapy.Field()
+#     page         = scrapy.Field()
+#     residence_id = scrapy.Field()
+#
+# class DealNewCountItem(scrapy.Item):
+#     __table__ = 't_web_lj_deal_count2_1'
+#
+#     name         = scrapy.Field()
+#     route        = scrapy.Field()
+#     count        = scrapy.Field()
+#     page         = scrapy.Field()
+#     url          = scrapy.Field()
+#     community_id = scrapy.Field()
 
 class DealItem(scrapy.Item):
-    __table__ = 'lj_deal'
+    __table__ = 't_web_lj_deal'
 
     structure         = scrapy.Field()
     orientation       = scrapy.Field()

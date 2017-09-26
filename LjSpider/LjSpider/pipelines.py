@@ -8,11 +8,11 @@ import json
 from collections import OrderedDict
 
 from LjSpider.items import *
-from LjSpider.Db.Postgresql import *
+from LjSpider.Db.Mysql import *
 
 class InsertPostgresqlPipeline(object):
     def process_item(self, item, spider):
-        Postgresql().insert_by_item(item)
+        Mysql().insert_by_item(item)
         return item
 
 class JsonPipeline(object):
