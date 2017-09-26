@@ -19,7 +19,7 @@ class DealIrtSpider(CrawlSpider):
     start_urls = []
     custom_settings = {
         'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_get_deal_irt_%s' % datetime.date.today(),
+        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_deal_irt_%s' % datetime.date.today(),
         'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
