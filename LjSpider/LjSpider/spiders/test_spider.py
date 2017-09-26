@@ -37,7 +37,7 @@ class TestSpider(CrawlSpider):
         self.d_c = {}
         d_c_q = Mysql().query_by_sql('''
             select d.route,c.route,c.id
-            from lj_district d,lj_community c
+            from t_web_lj_district d,t_web_lj_community c
             where d.id=c.district_id
         ''')
         for dc in d_c_q:
