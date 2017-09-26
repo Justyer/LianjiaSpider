@@ -8,6 +8,7 @@ sys.setdefaultencoding("utf-8")
 import re
 import time
 import psycopg2
+import datetime
 
 from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
@@ -15,7 +16,7 @@ from scrapy.loader import ItemLoader
 from scrapy.http import Request
 
 from LjSpider.items import *
-from LjSpider.Db.Postgresql import *
+from LjSpider.Db.Mysql import *
 
 from LjSpider.Exception.tryex import *
 
@@ -30,30 +31,30 @@ class ResidenceIrtSpider(CrawlSpider):
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
-           'LjSpider.pipelines.JsonPipeline': 301,
+        #    'LjSpider.pipelines.JsonPipeline': 301,
         }
     }
 
     def __init__(self):
         self.d_c = {}
-        d_c_q = Postgresql().query_by_sql('''
-            select d.route,c.route,c.id
+        d_c_q = Mysql().query_by_sql('''
+            select d.route d_r,c.route c_r,c.id
             from t_web_lj_district d,t_web_lj_community c
             where d.id=c.district_id
         ''')
         for dc in d_c_q:
-            d_c[dc[0] + '_' + dc[1]] = dc[2]
+            self.d_c[dc['d_r'] + '_' + dc['c_r']] = dc['id']
 
 
     def start_requests(self):
         url_list = []
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        csv_reader = csv.DictReader(codecs.open('../esf_irt_%s.csv' % str(yesterday), 'r', encoding='utf-8'))
+        csv_reader = csv.DictReader(codecs.open('esf_irt_2017-09-24.csv', 'r', encoding='utf-8'))
         for row in csv_reader:
-            url_list.apppend(row['residence_url'])
+            url_list.append(row['residence_url'])
             url_set = set(url_list)
         for url in url_set:
-            rlt = Postgresql().query_by_sql("select count(*) from lj_residence where url='%s'" % url)
+            rlt = Mysql().query_by_sql("select count(*) from t_web_lj_residence where url='%s'" % url)
             if rlt == []:
                 yield Request(
                     url,

@@ -12,7 +12,7 @@ from scrapy.http import Request
 from LjSpider.items import *
 from LjSpider.Db.Postgresql import *
 
-class EsfSpider(CrawlSpider):
+class EsfByRsdSpider(CrawlSpider):
     name = 'lj_get_esf'
     start_urls = []
     custom_settings = {

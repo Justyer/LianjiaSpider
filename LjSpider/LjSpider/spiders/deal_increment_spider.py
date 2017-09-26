@@ -11,16 +11,16 @@ from scrapy.loader import ItemLoader
 from scrapy.http import Request
 
 from LjSpider.items import *
-from LjSpider.Db.Postgresql import *
+from LjSpider.Db.Mysql import *
 from LjSpider.Exception import tryex
 
 class DealIrtSpider(CrawlSpider):
     name = 'lj_get_deal_irt'
     start_urls = []
     custom_settings = {
-        'FEED_URI': '../../common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '../../common/lj/crawls/lj_get_deal_irt_%s' % datetime.date.today(),
-        'LOG_FILE': '../../common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
+        # 'FEED_URI': '../../common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
+        # 'JOBDIR': '../../common/lj/crawls/lj_get_deal_irt_%s' % datetime.date.today(),
+        # 'LOG_FILE': '../../common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
             # 'LjSpider.middlewares.ProxyABYMiddleware': 203,
@@ -32,14 +32,14 @@ class DealIrtSpider(CrawlSpider):
     }
 
     def start_requests(self):
-        id_route = Postgresql().query_by_sql('''
+        id_route = Mysql().query_by_sql('''
                         select co.route,c.url
-                        from lj_district d,lj_community co,lj_city c
+                        from t_web_lj_district d,t_web_lj_community co,t_web_lj_city c
                         where d.id=co.district_id and d.city_id=c.id
                     ''')
-        for route, url in id_route:
+        for route_url in id_route:
             yield Request(
-                url + 'chengjiao/' + route + '/',
+                route_url['url'] + 'chengjiao/' + route_url['route'] + '/',
                 callback=self.get_deal_url,
                 dont_filter=True
             )

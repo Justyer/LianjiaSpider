@@ -11,16 +11,16 @@ from scrapy.loader import ItemLoader
 from scrapy.http import Request
 
 from LjSpider.items import *
-from LjSpider.Db.Postgresql import *
+from LjSpider.Db.Mysql import *
 from LjSpider.Exception import tryex
 
 class EsfIrtSpider(CrawlSpider):
     name = 'lj_get_esf_irt'
     start_urls = []
     custom_settings = {
-        'FEED_URI': '../../common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '../../common/lj/crawls/lj_get_esf_irt_%s' % datetime.date.today(),
-        'LOG_FILE': '../../common/lj/logs/lj_es_irt_%s.log' % datetime.date.today(),
+        # 'FEED_URI': '../../common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
+        # 'JOBDIR': '../../common/lj/crawls/lj_get_esf_irt_%s' % datetime.date.today(),
+        # 'LOG_FILE': '../../common/lj/logs/lj_es_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
             # 'LjSpider.middlewares.ProxyxxxMiddleware': 302,
@@ -33,15 +33,14 @@ class EsfIrtSpider(CrawlSpider):
 
     def start_requests(self):
         # id_esf_url = Postgresql().query('lj_residence', ['id', 'esf_url'])
-        id_esf_url = Postgresql().query_by_sql('''
+        id_esf_url = Mysql().query_by_sql('''
                         select co.route,c.url
-                        from lj_community co,lj_district d,lj_city c
+                        from t_web_lj_community co,t_web_lj_district d,t_web_lj_city c
                         where d.id=co.district_id and d.city_id=c.id
                     ''')
-        for c_route, url in id_esf_url:
+        for route_url in id_esf_url:
             yield Request(
-                url + 'ershoufang/' + c_route + '/co32/',
-                meta={'community': c_route},
+                route_url['url'] + 'ershoufang/' + route_url['route'] + '/co32/',
                 callback=self.get_esf_url,
                 dont_filter=True
             )
