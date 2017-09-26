@@ -1,6 +1,7 @@
 #-*- encoding:utf-8 -*-
 
 import codecs
+import datetime
 
 from scrapy.spiders import CrawlSpider
 from scrapy.selector import Selector
