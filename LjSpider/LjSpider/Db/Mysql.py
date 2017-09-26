@@ -4,9 +4,9 @@ class Mysql(object):
 
     def __init__(self):
         self.conn = pymysql.connect(host='localhost',
-                                    user='root',
-                                    password='162534',
-                                    db='dashuju',
+                                    user='dashuju',
+                                    password='8FTeR5dA!',
+                                    db='crawler',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()

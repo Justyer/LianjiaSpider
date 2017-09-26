@@ -6,7 +6,7 @@ from scrapy.loader import ItemLoader
 from scrapy.http import Request
 
 from LjSpider.items import *
-from LjSpider.Db.Postgresql import *
+from LjSpider.Db.Mysql import *
 
 from LjSpider.Exception import tryex
 
