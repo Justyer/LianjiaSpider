@@ -80,7 +80,7 @@ class EsfItem(scrapy.Item):
     elevator          = scrapy.Field()
 
     ring_num          = scrapy.Field()
-    t_web_lj_num            = scrapy.Field()
+    lj_num            = scrapy.Field()
 
     house_age         = scrapy.Field()
     property_type = scrapy.Field()
