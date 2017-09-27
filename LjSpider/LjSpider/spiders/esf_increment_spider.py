@@ -32,7 +32,6 @@ class EsfIrtSpider(CrawlSpider):
     }
 
     def start_requests(self):
-        id_esf_url = Postgresql().query('lj_residence', ['id', 'esf_url'])
         id_esf_url = Mysql().query_by_sql('''
                         select co.route,c.url
                         from t_web_lj_community co,t_web_lj_district d,t_web_lj_city c
