@@ -2,6 +2,7 @@
 
 import re
 import time
+import datetime
 import psycopg2
 
 from scrapy.spiders import CrawlSpider
