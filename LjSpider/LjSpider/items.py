@@ -48,7 +48,10 @@ class ResidenceItem(scrapy.Item):
     developer        = scrapy.Field()
     total_buildings  = scrapy.Field()
     total_houses     = scrapy.Field()
+    bsn_dt           = scrapy.Field()
+    tms              = scrapy.Field()
     url              = scrapy.Field()
+    webst_nm         = scrapy.Field()
     crawl_time       = scrapy.Field()
     community_id     = scrapy.Field()
 
@@ -63,7 +66,7 @@ class ResidenceItem(scrapy.Item):
 #     residence_id = scrapy.Field()
 
 class EsfItem(scrapy.Item):
-    __table__ = 't_web_lj_esf'
+    __table__ = 't_web_lj_esf_copy'
 
     structure         = scrapy.Field()
     orientation       = scrapy.Field()
@@ -93,7 +96,10 @@ class EsfItem(scrapy.Item):
     mortgage          = scrapy.Field()
     house_backup      = scrapy.Field()
 
+    bsn_dt            = scrapy.Field()
+    tms               = scrapy.Field()
     url               = scrapy.Field()
+    webst_nm          = scrapy.Field()
     crawl_time        = scrapy.Field()
     residence_url     = scrapy.Field()
     residence_id      = scrapy.Field()
@@ -117,7 +123,7 @@ class EsfItem(scrapy.Item):
 #     community_id = scrapy.Field()
 
 class DealItem(scrapy.Item):
-    __table__ = 't_web_lj_deal'
+    __table__ = 't_web_lj_deal_copy'
 
     structure         = scrapy.Field()
     orientation       = scrapy.Field()
@@ -145,7 +151,10 @@ class DealItem(scrapy.Item):
     deal_cycle        = scrapy.Field()
     look_times        = scrapy.Field()
 
+    bsn_dt            = scrapy.Field()
+    tms               = scrapy.Field()
     url               = scrapy.Field()
+    webst_nm          = scrapy.Field()
     crawl_time        = scrapy.Field()
     residence_url     = scrapy.Field()
     residence_id      = scrapy.Field()

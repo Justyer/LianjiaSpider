@@ -37,12 +37,17 @@
 # day_space = (latest_date - old_latest_date).days
 # print old_latest_date, latest_date, day_space
 
-import csv
-import codecs
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
-csv_reader = csv.DictReader(codecs.open('../esf_irt_20170922.csv', 'r', encoding='utf-8'))
-for row in csv_reader:
-    print 'f:', row['residence_url']
+# import csv
+# import codecs
+# import sys
+# reload(sys)
+# sys.setdefaultencoding("utf-8")
+#
+# csv_reader = csv.DictReader(codecs.open('../esf_irt_20170922.csv', 'r', encoding='utf-8'))
+# for row in csv_reader:
+#     print 'f:', row['residence_url']
+fabu_time_tian = ['0']
+if fabu_time_tian != [] and (int(fabu_time_tian[0]) == 0 or int(fabu_time_tian[0]) > 1):
+    print 'return'
+else:
+    print 'resume'

@@ -1,7 +1,6 @@
 #-*- encoding:utf-8 -*-
 
 import re
-import time
 import psycopg2
 import datetime
 
@@ -26,7 +25,7 @@ class EsfIrtSpider(CrawlSpider):
             # 'LjSpider.middlewares.ProxyxxxMiddleware': 302,
         },
         'ITEM_PIPELINES':{
-        #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
+           'LjSpider.pipelines.InsertMysqlPipeline': 300,
             # 'LjSpider.pipelines.JsonHFPipeline': 301,
         }
     }
@@ -55,9 +54,10 @@ class EsfIrtSpider(CrawlSpider):
             return
         fabu_time_gang = Selector(text=into_it).re(r'%s' % u'刚刚发布')
         fabu_time_tian = Selector(text=into_it).re(r'(\d+)%s' % u'天以前发布')
+        print fabu_time_gang, fabu_time_tian
         if not fabu_time_gang and not fabu_time_tian:
             return
-        if fabu_time_tian != [] and int(fabu_time_tian[0]) > 1:
+        if fabu_time_tian != [] and (int(fabu_time_tian[0]) == 0 or int(fabu_time_tian[0]) > 1):
             return
 
         esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
@@ -135,8 +135,11 @@ class EsfIrtSpider(CrawlSpider):
         item['mortgage']          = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../span[2]/text()' % u'抵押信息').extract_first()
         item['house_backup']      = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房本备件').extract_first()
 
+        item['bsn_dt']            = str(datetime.date.today())
+        item['tms']               = datetime.datetime.now().strftime('%Y-%m-%d %X')
         item['url']               = response.url
-        item['crawl_time']        = time.strftime("%Y-%m-%d %X",time.localtime())
+        item['webst_nm']          = u'链家'
+        item['crawl_time']        = datetime.datetime.now().strftime('%Y-%m-%d %X')
 
         residence_url = sr.xpath('//*[@class="communityName"]/a[1]/@href').extract_first()
         if residence_url is not None:

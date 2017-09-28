@@ -10,7 +10,7 @@ from collections import OrderedDict
 from LjSpider.items import *
 from LjSpider.Db.Mysql import *
 
-class InsertPostgresqlPipeline(object):
+class InsertMysqlPipeline(object):
     def process_item(self, item, spider):
         Mysql().insert_by_item(item)
         return item

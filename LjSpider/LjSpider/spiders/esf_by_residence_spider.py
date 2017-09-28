@@ -13,7 +13,7 @@ from LjSpider.items import *
 from LjSpider.Db.Postgresql import *
 
 class EsfByRsdSpider(CrawlSpider):
-    name = 'lj_get_esf'
+    name = 'lj_get_esf_rsd'
     start_urls = []
     custom_settings = {
         # 'JOBDIR': 'crawls/lj_get_esf-3',

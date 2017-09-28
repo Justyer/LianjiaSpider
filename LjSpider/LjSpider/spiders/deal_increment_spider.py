@@ -26,7 +26,7 @@ class DealIrtSpider(CrawlSpider):
             # 'LjSpider.middlewares.ProxyABYMiddleware': 203,
         },
         'ITEM_PIPELINES':{
-        #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
+           'LjSpider.pipelines.InsertMysqlPipeline': 300,
             # 'LjSpider.pipelines.JsonPipeline': 300,
         }
     }
@@ -135,8 +135,12 @@ class DealIrtSpider(CrawlSpider):
         item['deal_cycle']        = tryex.strip(sr.xpath('//*[@class="msg"]/span[2]/label/text()').extract_first())
         item['look_times']        = tryex.strip(sr.xpath('//*[@class="msg"]/span[4]/label/text()').extract_first())
 
+        item['bsn_dt']            = str(datetime.date.today())
+        item['tms']               = datetime.datetime.now().strftime('%Y-%m-%d %X')
         item['url']               = response.url
-        item['crawl_time']        = time.strftime("%Y-%m-%d %X",time.localtime())
+        item['webst_nm']          = u'链家'
+        item['crawl_time']        = datetime.datetime.now().strftime('%Y-%m-%d %X')
+        
         item['residence_url']     = response.url[0:23]+ 'xiaoqu/' + sr.re(r"resblockId:'(.*)'")[0] + '/'
         item['residence_id']      = -3
         yield item

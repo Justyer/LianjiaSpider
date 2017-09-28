@@ -24,7 +24,7 @@ class ResidenceSpider(CrawlSpider):
             'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
-        #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
+           'LjSpider.pipelines.InsertMysqlPipeline': 300,
         #    'LjSpider.pipelines.JsonPipeline': 301,
         }
     }
@@ -83,7 +83,10 @@ class ResidenceSpider(CrawlSpider):
         item['developer']        = sr.xpath('//*[@class="xiaoquInfo"]/div[5]/span[2]/text()').extract_first()
         item['total_buildings']  = sr.xpath('//*[@class="xiaoquInfo"]/div[6]/span[2]/text()').extract_first()
         item['total_houses']     = sr.xpath('//*[@class="xiaoquInfo"]/div[7]/span[2]/text()').extract_first()
-        item['url']              = response.url
-        item['crawl_time']       = time.strftime("%Y-%m-%d %X",time.localtime())
+        item['bsn_dt']            = str(datetime.date.today())
+        item['tms']               = datetime.datetime.now().strftime('%Y-%m-%d %X')
+        item['url']               = response.url
+        item['webst_nm']          = u'链家'
+        item['crawl_time']        = datetime.datetime.now().strftime('%Y-%m-%d %X')
         item['community_id']     = self.d_c[response.request.meta['d_c']]
         yield item
