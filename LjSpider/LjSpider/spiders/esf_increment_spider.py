@@ -88,7 +88,7 @@ class EsfIrtSpider(CrawlSpider):
 
         listing_date = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=7)
+        oneday = datetime.timedelta(days=3)
         yesterday = today - oneday
         old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
         try:

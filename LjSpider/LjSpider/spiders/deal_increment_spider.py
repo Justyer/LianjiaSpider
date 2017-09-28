@@ -26,7 +26,7 @@ class DealIrtSpider(CrawlSpider):
             # 'LjSpider.middlewares.ProxyABYMiddleware': 203,
         },
         'ITEM_PIPELINES':{
-           'LjSpider.pipelines.InsertMysqlPipeline': 300,
+        #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
             # 'LjSpider.pipelines.JsonPipeline': 300,
         }
     }
@@ -140,7 +140,7 @@ class DealIrtSpider(CrawlSpider):
         item['url']               = response.url
         item['webst_nm']          = u'链家'
         item['crawl_time']        = datetime.datetime.now().strftime('%Y-%m-%d %X')
-        
+
         item['residence_url']     = response.url[0:23]+ 'xiaoqu/' + sr.re(r"resblockId:'(.*)'")[0] + '/'
         item['residence_id']      = -3
         yield item
