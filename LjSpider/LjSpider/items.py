@@ -66,7 +66,7 @@ class ResidenceItem(scrapy.Item):
 #     residence_id = scrapy.Field()
 
 class EsfItem(scrapy.Item):
-    __table__ = 't_web_lj_esf_copy'
+    __table__ = 't_web_lj_esf'
 
     structure         = scrapy.Field()
     orientation       = scrapy.Field()
@@ -123,7 +123,7 @@ class EsfItem(scrapy.Item):
 #     community_id = scrapy.Field()
 
 class DealItem(scrapy.Item):
-    __table__ = 't_web_lj_deal_copy'
+    __table__ = 't_web_lj_deal'
 
     structure         = scrapy.Field()
     orientation       = scrapy.Field()

@@ -54,7 +54,6 @@ class EsfIrtSpider(CrawlSpider):
             return
         fabu_time_gang = Selector(text=into_it).re(r'%s' % u'刚刚发布')
         fabu_time_tian = Selector(text=into_it).re(r'(\d+)%s' % u'天以前发布')
-        print fabu_time_gang, fabu_time_tian
         if not fabu_time_gang and not fabu_time_tian:
             return
         if fabu_time_tian != [] and (int(fabu_time_tian[0]) == 0 or int(fabu_time_tian[0]) > 1):
