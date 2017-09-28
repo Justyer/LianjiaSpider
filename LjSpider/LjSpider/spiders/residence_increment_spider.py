@@ -18,8 +18,8 @@ class ResidenceIrtSpider(CrawlSpider):
     start_urls = []
     custom_settings = {
         'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_residence_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_residence_irt_%s' % datetime.date.today(),
-        'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_residence_irt_%s.log' % datetime.date.today(),
+        # 'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_residence_irt_%s' % datetime.date.today(),
+        # 'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_residence_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
         },
@@ -44,7 +44,8 @@ class ResidenceIrtSpider(CrawlSpider):
         for one_d in q_result:
             yield Request(
                 one_d['url'] + 'xiaoqu/' + one_d['c_r'] + '/',
-                callback=self.get_residence_url
+                callback=self.get_residence_url,
+                dont_filter=True
             )
 
     def get_residence_url(self,response):
@@ -60,7 +61,8 @@ class ResidenceIrtSpider(CrawlSpider):
             yield Request(
                 url,
                 meta={'d_c': district + '_' + community},
-                callback=self.get_residence_info
+                callback=self.get_residence_info,
+                dont_filter=True
             )
         page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
         if page_box is not None:
@@ -69,7 +71,8 @@ class ResidenceIrtSpider(CrawlSpider):
             if totalPage > curPage:
                 yield Request(
                     response.url[0:response.url.find('/', 30) + 1] + 'pg' + str(curPage + 1) + '/',
-                    callback=self.get_residence_url
+                    callback=self.get_residence_url,
+                    dont_filter=True
                 )
 
     def get_residence_info(self, response):

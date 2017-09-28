@@ -3,18 +3,18 @@ import pymysql.cursors
 class Mysql(object):
 
     def __init__(self):
-        self.conn = pymysql.connect(host='localhost',
-                                    user='dashuju',
-                                    password='8FTeR5dA!',
-                                    db='crawler',
-                                    charset='utf8mb4',
-                                    cursorclass=pymysql.cursors.DictCursor)
         # self.conn = pymysql.connect(host='localhost',
-        #                             user='root',
-        #                             password='162534',
+        #                             user='dashuju',
+        #                             password='8FTeR5dA!',
         #                             db='crawler',
         #                             charset='utf8mb4',
         #                             cursorclass=pymysql.cursors.DictCursor)
+        self.conn = pymysql.connect(host='localhost',
+                                    user='root',
+                                    password='162534',
+                                    db='crawler',
+                                    charset='utf8mb4',
+                                    cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
 
     def insert_by_item(self, item):
