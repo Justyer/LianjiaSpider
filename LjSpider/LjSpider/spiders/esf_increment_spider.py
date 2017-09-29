@@ -22,7 +22,7 @@ class EsfIrtSpider(CrawlSpider):
             'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
-        #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
+           'LjSpider.pipelines.InsertMysqlPipeline': 300,
         }
     }
 
