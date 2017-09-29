@@ -16,8 +16,8 @@ class EsfIrtSpider(CrawlSpider):
     name = 'lj_get_esf_irt'
     start_urls = []
     custom_settings = {
-        # 'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
-        # 'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_esf_irt_%s.log' % datetime.date.today(),
+        'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
+        'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_esf_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
             'LjSpider.middlewares.ProxyMiddleware': 202,
         },
