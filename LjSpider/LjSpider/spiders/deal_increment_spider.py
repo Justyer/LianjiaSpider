@@ -21,7 +21,7 @@ class DealIrtSpider(CrawlSpider):
         # 'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
         # 'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
-            # 'LjSpider.middlewares.ProxyMiddleware': 202,
+            'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertMysqlPipeline': 300,

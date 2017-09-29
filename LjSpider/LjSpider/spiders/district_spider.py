@@ -16,7 +16,7 @@ class DistrictSpider(CrawlSpider):
         #    'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
-           'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
+        #    'LjSpider.pipelines.InsertPostgresqlPipeline': 300,
         #    'LjSpider.pipelines.JsonPipeline': 301,
         }
     }
