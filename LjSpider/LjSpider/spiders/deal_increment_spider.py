@@ -18,16 +18,13 @@ class DealIrtSpider(CrawlSpider):
     name = 'lj_get_deal_irt'
     start_urls = []
     custom_settings = {
-        'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_deal_irt_%s' % datetime.date.today(),
-        'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
+        # 'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_deal_irt_%s.csv' % datetime.date.today(),
+        # 'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_deal_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
-            'LjSpider.middlewares.ProxyMiddleware': 202,
-            # 'LjSpider.middlewares.ProxyABYMiddleware': 203,
+            # 'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
         #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
-            # 'LjSpider.pipelines.JsonPipeline': 300,
         }
     }
 
@@ -43,12 +40,6 @@ class DealIrtSpider(CrawlSpider):
                 callback=self.get_deal_url,
                 dont_filter=True
             )
-
-        # return [Request(
-        #     'https://bj.lianjia.com/chengjiao/anzhen1/',
-        #     callback=self.get_deal_url,
-        #     dont_filter=True
-        # )]
 
     def get_deal_url(self,response):
         deal_list = Selector(response).xpath('/html/body/div[5]/div[1]/ul/li').extract()
@@ -78,8 +69,6 @@ class DealIrtSpider(CrawlSpider):
                 )
 
     def get_deal_info(self, response):
-        # print 'Url:', response.url
-
         sr = Selector(response)
         item = DealItem()
 
@@ -90,7 +79,7 @@ class DealIrtSpider(CrawlSpider):
             return
 
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=25)
+        oneday = datetime.timedelta(days=3)
         yesterday = today - oneday
         old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
         try:

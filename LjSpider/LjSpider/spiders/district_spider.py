@@ -29,12 +29,18 @@ class DistrictSpider(CrawlSpider):
         #         meta={'id': id_},
         #         callback=self.get_district
         #     )
-        yield Request(
+        # yield Request(
+        #     'http://sh.lianjia.com/xiaoqu/',
+        #     meta={'id': 2},
+        #     callback=self.get_district,
+        #     dont_filter=True
+        # )
+        return [Request(
             'http://sh.lianjia.com/xiaoqu/',
             meta={'id': 2},
             callback=self.get_district,
             dont_filter=True
-        )
+        )]
 
     def get_district(self, response):
         # cn_name = Selector(response).xpath('/html/body/div[3]/div[1]/dl[2]/dd/div/div/a/text()').extract()

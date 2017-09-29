@@ -9,12 +9,6 @@ class Mysql(object):
                                     db='crawler',
                                     charset='utf8mb4',
                                     cursorclass=pymysql.cursors.DictCursor)
-        # self.conn = pymysql.connect(host='localhost',
-        #                             user='root',
-        #                             password='162534',
-        #                             db='crawler',
-        #                             charset='utf8mb4',
-        #                             cursorclass=pymysql.cursors.DictCursor)
         self.cur = self.conn.cursor()
 
     def insert_by_item(self, item):

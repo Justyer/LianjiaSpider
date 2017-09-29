@@ -17,15 +17,13 @@ class ResidenceIrtSpider(CrawlSpider):
     name = 'lj_get_residence_irt'
     start_urls = []
     custom_settings = {
-        'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_residence_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_residence_irt_%s' % datetime.date.today(),
-        'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_residence_irt_%s.log' % datetime.date.today(),
+        # 'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_residence_irt_%s.csv' % datetime.date.today(),
+        # 'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_residence_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
-            'LjSpider.middlewares.ProxyMiddleware': 202,
+            # 'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
-           'LjSpider.pipelines.InsertMysqlPipeline': 300,
-        #    'LjSpider.pipelines.JsonPipeline': 301,
+        #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
         }
     }
 

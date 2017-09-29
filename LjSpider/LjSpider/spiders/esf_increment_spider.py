@@ -1,7 +1,6 @@
 #-*- encoding:utf-8 -*-
 
 import re
-import psycopg2
 import datetime
 
 from scrapy.spiders import CrawlSpider
@@ -17,16 +16,13 @@ class EsfIrtSpider(CrawlSpider):
     name = 'lj_get_esf_irt'
     start_urls = []
     custom_settings = {
-        'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
-        'JOBDIR': '/usr/local/crawler/dxc/common/lj/crawls/lj_esf_irt_%s' % datetime.date.today(),
-        'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_esf_irt_%s.log' % datetime.date.today(),
+        # 'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_esf_irt_%s.csv' % datetime.date.today(),
+        # 'LOG_FILE': '/usr/local/crawler/dxc/common/lj/logs/lj_esf_irt_%s.log' % datetime.date.today(),
         'DOWNLOADER_MIDDLEWARES':{
-            'LjSpider.middlewares.ProxyMiddleware': 202,
-            # 'LjSpider.middlewares.ProxyxxxMiddleware': 302,
+            # 'LjSpider.middlewares.ProxyMiddleware': 202,
         },
         'ITEM_PIPELINES':{
-           'LjSpider.pipelines.InsertMysqlPipeline': 300,
-            # 'LjSpider.pipelines.JsonHFPipeline': 301,
+        #    'LjSpider.pipelines.InsertMysqlPipeline': 300,
         }
     }
 
@@ -42,11 +38,6 @@ class EsfIrtSpider(CrawlSpider):
                 callback=self.get_esf_url,
                 dont_filter=True
             )
-        # return [Request(
-        #     'https://nj.lianjia.com/ershoufang/hanzhongmendajie/co32/',
-        #     callback=self.get_esf_url,
-        #     dont_filter=True
-        # )]
 
     def get_esf_url(self,response):
         into_it = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li[1]/div[1]/div[4]/text()').extract_first()
@@ -56,7 +47,7 @@ class EsfIrtSpider(CrawlSpider):
         fabu_time_tian = Selector(text=into_it).re(r'(\d+)%s' % u'天以前发布')
         if not fabu_time_gang and not fabu_time_tian:
             return
-        if fabu_time_tian != [] and (int(fabu_time_tian[0]) == 0 or int(fabu_time_tian[0]) > 1):
+        if fabu_time_tian != [] and int(fabu_time_tian[0]) > 1:
             return
 
         esf_url = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li/a/@href').extract()
@@ -80,14 +71,12 @@ class EsfIrtSpider(CrawlSpider):
                 )
 
     def get_esf_info(self, response):
-        # print 'Url:', response.url
-
         sr = Selector(response)
         item = EsfItem()
 
         listing_date = sr.xpath('//*[@id="introduction"]/div/div/div[2]/div[2]/ul/li/span[text()="%s"]/../text()' % u'挂牌时间').extract_first()
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=3)
+        oneday = datetime.timedelta(days=1)
         yesterday = today - oneday
         old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
         try:
@@ -95,7 +84,7 @@ class EsfIrtSpider(CrawlSpider):
         except:
             return
         day_space = (latest_date - old_latest_date).days
-        if day_space < 0:
+        if day_space <= 0:
             return
 
         item['structure']         = sr.xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()
