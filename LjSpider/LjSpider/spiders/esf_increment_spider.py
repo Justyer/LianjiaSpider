@@ -84,7 +84,7 @@ class EsfIrtSpider(CrawlSpider):
         except:
             return
         day_space = (latest_date - old_latest_date).days
-        if day_space <= 0:
+        if day_space != 0:
             return
 
         item['structure']         = sr.xpath('//*[@id="introduction"]/div/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first()

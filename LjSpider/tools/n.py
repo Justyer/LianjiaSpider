@@ -46,8 +46,24 @@
 # csv_reader = csv.DictReader(codecs.open('../esf_irt_20170922.csv', 'r', encoding='utf-8'))
 # for row in csv_reader:
 #     print 'f:', row['residence_url']
-fabu_time_tian = ['0']
-if fabu_time_tian != [] and (int(fabu_time_tian[0]) == 0 or int(fabu_time_tian[0]) > 1):
-    print 'return'
+# fabu_time_tian = ['0']
+# if fabu_time_tian != [] and (int(fabu_time_tian[0]) == 0 or int(fabu_time_tian[0]) > 1):
+#     print 'return'
+# else:
+#     print 'resume'
+
+import datetime
+
+deal_date = '2017-09-26'
+today = datetime.date.today()
+oneday = datetime.timedelta(days=3)
+yesterday = today - oneday
+old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
+latest_date = datetime.datetime.strptime(deal_date, '%Y-%m-%d')
+today_date = datetime.datetime.strptime(str(today), '%Y-%m-%d')
+day_space = (latest_date - old_latest_date).days
+except_today = (latest_date - today_date).days
+if day_space < 0 or except_today == 0:
+    print 'chuqule'
 else:
-    print 'resume'
+    print 'meichuqu'

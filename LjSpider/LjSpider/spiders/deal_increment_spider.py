@@ -86,8 +86,10 @@ class DealIrtSpider(CrawlSpider):
             latest_date = datetime.datetime.strptime(deal_date, '%Y.%m.%d')
         except:
             return
+        today_date = datetime.datetime.strptime(str(today), '%Y-%m-%d')
         day_space = (latest_date - old_latest_date).days
-        if day_space < 0:
+        except_today = (latest_date - today_date).days
+        if day_space < 0 or except_today == 0:
             return
 
         item['structure']         = tryex.strip(sr.xpath('//*[@id="introduction"]/div/div[1]/div[2]/ul/li/span[text()="%s"]/../text()' % u'房屋户型').extract_first())
