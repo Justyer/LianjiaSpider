@@ -79,7 +79,7 @@ class DealIrtSpider(CrawlSpider):
             return
 
         today = datetime.date.today()
-        oneday = datetime.timedelta(days=3)
+        oneday = datetime.timedelta(days=30)
         yesterday = today - oneday
         old_latest_date = datetime.datetime.strptime(str(yesterday), '%Y-%m-%d')
         try:
