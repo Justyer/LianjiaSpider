@@ -32,29 +32,28 @@ class ResidenceSpider(CrawlSpider):
 
     def start_requests(self):
         q_result = Mysql().query_by_sql('''
-                            select co.id,di.route d_r,co.route c_r,ci.url
+                            select ci.cn_name,co.route c_r,ci.url
                             from t_web_lj_community co,t_web_lj_district di,t_web_lj_city ci
                             where co.district_id=di.id and di.city_id=ci.id;
                         ''')
-        for one_r in q_result:
-            self.d_c[one_r['d_r'] + '_' + one_r['c_r']] = one_r['id']
 
         for one_d in q_result:
             yield Request(
                 one_d['url'] + 'xiaoqu/' + one_d['c_r'] + '/',
+                meta={'rsd_ci': one_d['cn_name']},
                 callback=self.get_residence_url
             )
 
     def get_residence_url(self,response):
         li = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li').extract()
         for l in li:
-            st = Selector(text=l)
-            url = st.xpath('//*[@class="img"]/@href').extract_first()
-            district = st.xpath('//*[@class="district"]/@href').extract_first().split('/')[-2]
-            community = st.xpath('//*[@class="bizcircle"]/@href').extract_first().split('/')[-2]
+            st        = Selector(text=l)
+            url       = st.xpath('//*[@class="img"]/@href').extract_first()
+            district  = st.xpath('//*[@class="district"]/text()').extract_first()
+            community = st.xpath('//*[@class="bizcircle"]/text()').extract_first()
             yield Request(
                 url,
-                meta={'d_c': district + '_' + community},
+                meta={'rsd_ci': response.request.meta['rsd_ci'],'rsd_di': district, 'rsd_co': community},
                 callback=self.get_residence_info
             )
         page_box = Selector(response).xpath('//*[@class="page-box house-lst-page-box"]').extract_first()
@@ -64,6 +63,7 @@ class ResidenceSpider(CrawlSpider):
             if totalPage > curPage:
                 yield Request(
                     response.url[0:response.url.find('/', 30) + 1] + 'pg' + str(curPage + 1) + '/',
+                    meta={'rsd_ci': response.request.meta['rsd_ci']},
                     callback=self.get_residence_url
                 )
 
@@ -86,5 +86,8 @@ class ResidenceSpider(CrawlSpider):
         item['url']               = response.url
         item['webst_nm']          = u'链家'
         item['crawl_time']        = datetime.datetime.now().strftime('%Y-%m-%d %X')
-        item['community_id']     = self.d_c[response.request.meta['d_c']]
+        item['city']              = response.request.meta['rsd_ci']
+        item['district']          = response.request.meta['rsd_di']
+        item['community']         = response.request.meta['rsd_co']
+        item['community_id']      = None
         yield item

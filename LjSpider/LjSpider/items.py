@@ -53,6 +53,9 @@ class ResidenceItem(scrapy.Item):
     url              = scrapy.Field()
     webst_nm         = scrapy.Field()
     crawl_time       = scrapy.Field()
+    city             = scrapy.Field()
+    district         = scrapy.Field()
+    community        = scrapy.Field()
     community_id     = scrapy.Field()
 
 # class AroundItem(scrapy.Item):

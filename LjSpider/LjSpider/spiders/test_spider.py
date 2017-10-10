@@ -16,16 +16,7 @@ from LjSpider.Exception import tryex
 class TestSpider(CrawlSpider):
     name = 'sys_test'
     start_urls = [
-        'http://118.190.22.19',
-        'https://bj.lianjia.com/xiaoqu/1111047349969/',
-        'https://nj.lianjia.com/ershoufang/103101703194.html',
-        'https://nj.lianjia.com/chengjiao/103101536973.html',
-        'http://sh.lianjia.com/xiaoqu/dahua/',
-        'https://wh.lianjia.com/ershoufang/104100580150.html',
-        'https://bj.lianjia.com/xiaoqu/andingmen/',
-        'https://bj.lianjia.com/chengjiao/101100788395.html',
-        'https://bj.lianjia.com/chengjiao/101101012718.html',
-        'https://bj.lianjia.com/xiaoqu/1111027375686/',
+        'https://qd.lianjia.com/xiaoqu/shinan/',
     ]
     custom_settings = {
         # 'FEED_URI': '/usr/local/crawler/dxc/common/lj/data/lj_test_%s.csv' % datetime.datetime.now(),
@@ -42,17 +33,24 @@ class TestSpider(CrawlSpider):
     def start_requests(self):
         return [Request(
             self.start_urls[0],
+            meta={'first': 'woshi1'},
             callback=self.test_page,
             dont_filter=True
         )]
 
     def test_page(self, response):
-        is_exist = Mysql().query_by_sql("select url from t_web_lj_residence where url='https://bj.lianjia.com/xiaoqu/1111027375686/'")
-        # print 'kong2:', type(Mysql().query_by_sql("select url from t_web_lj_residence where url='https://bj.lianjia.com/xiaoqu/1111027375686/'"))
-        if isinstance(is_exist, list):
-            print 'list_a'
-        else:
-            print 'tuple_a'
-        # fil = codecs.open('/usr/local/crawler/dxc/I.txt', 'a', encoding='utf-8')
-        # fil.write('I am I.')
-        # fil.close()
+        li = Selector(response).xpath('/html/body/div[4]/div[1]/ul/li').extract()
+        for l in li:
+            st        = Selector(text=l)
+            url       = st.xpath('//*[@class="img"]/@href').extract_first()
+            district  = st.xpath('//*[@class="district"]/text()').extract_first()
+            community = st.xpath('//*[@class="bizcircle"]/text()').extract_first()
+            print 'fnsl:', district, community
+        yield Request(
+            'https://qd.lianjia.com/xiaoqu/1511041269006/',
+            meta={'second': 'woshi2'},
+            callback=self.test_info
+        )
+
+    def test_info(self, response):
+        print 'meta:', response.request.meta
