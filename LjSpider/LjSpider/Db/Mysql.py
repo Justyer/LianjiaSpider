@@ -123,6 +123,16 @@ class Mysql(object):
             self.cur.close()
             self.conn.close()
 
+    def truncate_table(self, table_name):
+        try:
+            sql = 'truncate table ' + table_name
+            self.cur.execute(sql)
+        except Exception, e:
+            print '[' + table_name + '] truncate failed:' + str(e)
+        finally:
+            self.cur.close()
+            self.conn.close()
+
 if __name__ == '__main__':
     m = Mysql()
     print m.insert_by_sql("insert into nice(ip) values('zuole')")
