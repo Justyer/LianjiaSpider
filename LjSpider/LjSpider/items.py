@@ -89,7 +89,7 @@ class EsfItem(scrapy.Item):
     lj_num            = scrapy.Field()
 
     house_age         = scrapy.Field()
-    property_type = scrapy.Field()
+    property_type     = scrapy.Field()
     house_type        = scrapy.Field()
     house_owner       = scrapy.Field()
     listing_date      = scrapy.Field()
