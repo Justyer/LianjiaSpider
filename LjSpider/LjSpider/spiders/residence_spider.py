@@ -24,7 +24,8 @@ class ResidenceSpider(CrawlSpider):
         },
         'ITEM_PIPELINES':{
            'LjSpider.pipelines.InsertMysqlPipeline': 300,
-        }
+        },
+        'DOWNLOAD_DELAY': 0.2
     }
 
     def __init__(self):
